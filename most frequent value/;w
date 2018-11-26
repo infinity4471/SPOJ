@@ -1,0 +1,122 @@
+#include <cstdio>
+#include <algorithm>
+#include <cstring>
+#include <vector>
+
+#define BUCK 317
+#define MAXN BUCK * BUCK
+ 
+#define X first
+#define Y second
+#define mp make_pair
+#define pb push_back
+ 
+using namespace std;
+ 
+typedef pair< int, int > pii;
+ 
+struct query {
+    pii interval;
+    int idx;
+};
+ 
+bool operator<( query A, query B )
+{
+    return A.interval < B.interval;
+}
+ 
+vector< int > ends[ MAXN + 1 ], occ[ MAXN + 1 ], elements;
+
+int total[ MAXN + 1 ], inbucket[ MAXN + 1 ];
+int A[ MAXN + 1 ], ans[ MAXN + 1 ];
+vector< query > queries;
+
+int readint() {
+    int n = 0;
+    char c = getchar_unlocked();
+    while ( !( '0' <= c && c <= '9' ) ) {
+        c = getchar_unlocked();
+    }
+    while ( '0' <= c && c <= '9' ) {
+        n = n * 10 + c - '0';
+        c = getchar_unlocked();
+    }
+    return n;
+}
+
+int count_bound( int myelem, int original )
+{
+    int lo = 0, hi = occ[ myelem ].size() - 1, ans = -1;
+    while( lo <= hi ) {
+        int mid = ( lo + hi ) / 2;
+        if( occ[ myelem ][ mid ] < original ) {
+            ans = mid;
+            lo = mid + 1;
+        } else {
+            hi = mid - 1;
+        }
+    }
+    return ans + 1;
+}
+
+int main() {
+    freopen("test.in","rt",stdin);
+    freopen("test.out","wt",stdout);
+    int N, Q, u, v, cnt = 0;
+    N = readint();
+    Q = readint();
+    for( int i = 1; i <= N; i++ ) {
+        A[ i ] = readint();
+    }
+    for( int i = 1; i <= Q; i++ ) {
+        u = readint();
+        v = readint();
+        queries.pb( ( query ) { mp( u + 1, v + 1 ), i } );
+    }
+
+    queries.pb( ( query ) { mp( MAXN, MAXN ), MAXN } );
+    
+    sort( queries.begin(), queries.end() );
+    for( int b = 1; BUCK * ( b - 1 ) + 1 <= N && cnt <= Q; b++ ) {
+        int sol = 0, max_out = 0, pointer;
+        while( cnt <= Q && queries[ cnt ].interval.X <= BUCK * b ) {
+            ends[ queries[ cnt ].interval.Y ].pb( cnt );
+            cnt++;
+        }
+        for( int i = BUCK * ( b - 1 ) + 1; i <= BUCK * b && i <= N; i++ ) {
+            if( !inbucket[ A[ i ] ] ) {
+                elements.pb( A[ i ] );
+            }
+            inbucket[ A[ i ] ] = true;
+            occ[ A[ i ] ].pb( i );
+        }
+        pointer = BUCK * ( b - 1 ) + 1;
+        do {
+            while( pointer <= N ) {
+                total[ A[ pointer ] ]++;
+                if( !inbucket[ A[ pointer ] ] ) max_out = max( max_out, total[ A[ pointer ] ] );
+                if( ends[ pointer ].size() > 0 ) break;
+                pointer++;
+            }
+            for( int k = 0; k < ( int )ends[ pointer ].size(); k++ ) {
+                sol = max_out;
+                for( int j = 0; j < ( int )elements.size(); j++ ) {
+                    sol = max( sol, total[ elements[ j ] ] - count_bound( elements[ j ], queries[ ends[ pointer ][ k ] ].interval.X ) );
+                }
+                ans[ queries[ ends[ pointer ][ k ] ].idx ] = sol;
+            }
+            ends[ pointer ].clear();
+            pointer++;
+        } while( pointer <= N );
+        memset( total, 0, sizeof( total ) );
+        for( int i = 0; i < ( int )elements.size(); i++ ) {
+            inbucket[ elements[ i ] ] = false;
+            occ[ elements[ i ] ].clear();
+        }
+        elements.clear();
+    }
+    for( int i = 1; i <= Q; i++ ) {
+        printf("%d\n", ans[ i ] );
+    }
+    return 0;
+}
