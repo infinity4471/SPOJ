@@ -1,0 +1,83 @@
+#include <cstdio>
+#include <vector>
+#include <algorithm>
+
+#define MAX 120
+
+using namespace std;
+ 
+vector < int > graph[MAX];
+bool visited[MAX];
+int Left[MAX], Right[MAX];
+ 
+void init()
+{
+	for(int i = 0; i < MAX; i++ ) {
+		graph[ i ].clear();
+	}
+}
+ 
+bool dfs(int u)
+{
+	if( visited[ u ] ) return false;
+	visited[ u ] = true;
+	int len = graph[u].size(),v;
+	for(int i = 0; i < len; i++ ) {
+		v = graph[u][i];
+		if(Right[ v ] == -1) {
+			Right[ v ] = u, Left [ u ] = v;
+			return true;
+		}
+	}
+	for(int i = 0; i < len; i++ ) {
+		v = graph[ u ] [ i ];
+		if(dfs( Right[ v ] ) ) {
+			Right[ v ] = u, Left[ u ] = v;
+			return true;
+		}
+	}
+	return false;
+}
+ 
+int match()
+{
+	int maxflow = 0;
+	bool done;
+	for(int i = 0 ; i < MAX; i++ ) {
+		Left[ i ] = -1;
+		Right[ i ] = -1;
+	}
+	do {
+		done = true;
+		for(int i = 0; i < MAX; i++ ) {
+			visited[ i ] = false;
+		}
+		for(int i=0; i<MAX; i++) {
+			if(Left[i]==-1 && dfs(i)) {
+				done = false;
+			}
+		}
+	} while( !done );
+	for(int i=0; i < MAX; i++ ) {
+		if( Left[ i ] != -1 ) {
+			maxflow++;
+		}
+	}
+	return maxflow;
+}
+ 
+int main() {
+	int T;
+	scanf("%d", &T);
+	while( T-- ) {
+		int N,u,v;
+		scanf("%d", &N);
+		init();
+		for(int i = 0; i < N; i++ ) {
+			scanf("%d%d", &u, &v);
+			graph[u].push_back(v);
+		}
+		printf("%d\n", match());
+	}
+	return 0;
+}

@@ -1,0 +1,17 @@
+#include <cstdio>
+
+int main(void)
+{
+	int N,M,val,prev;
+	while( 1 ) {
+		scanf("%d%d",&N,&M);
+		if(N==0 && M==0) break;
+		prev = 0;
+		for(int i=2; i<=N; i++) {
+			val = (prev + M) % i;
+			prev = val;
+		}
+		printf("%d %d %d\n",N,M,val+1);
+	}
+	return 0;
+}

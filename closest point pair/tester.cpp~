@@ -1,0 +1,21 @@
+#include <cstdio>
+#include <algorithm>
+#include <cmath>
+#include <ctime>
+
+using namespace std;
+
+int main( void )
+{
+	srand( time( NULL ) );
+	int N,x,y;
+	freopen("test.in","wt",stdout);
+	N = rand() % 5001;
+	printf("%d\n", N );
+	for( int i = 0; i < N; i++ ) {
+		x = rand() % 1000000;
+		y = rand() % 1000000;
+		printf("%d %d\n", x,y );
+	}
+	return 0;
+}

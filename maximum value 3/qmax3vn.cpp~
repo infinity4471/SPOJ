@@ -1,0 +1,110 @@
+#include <cstdio>
+#include <algorithm>
+#include <ctime>
+
+#define MAXN 100100
+#define INF 1234567890
+
+using namespace std;
+
+struct node {
+	int priority, key, size, ans;
+	struct node* left;
+	struct node* right;
+	node(int newkey) {
+		priority = rand() % INF + 1;
+		ans = key = newkey;
+		size = 1;
+		left = right = NULL;
+	}
+};
+
+int S( node* root )
+{
+	if( root == NULL ) {
+		return 0;
+	} else {
+		return root->size;
+	}
+}
+
+int A( node* root )
+{
+	if( root == NULL ) {
+		return -INF;
+	} else {
+		return root->ans;
+	}
+}
+
+void update_size( node* &root )
+{
+	if( root ) {
+		root->size = S( root->left ) + S( root->right ) + 1;
+		root->ans = max( root->key, max( root->left->ans, root->right-> ans ) );
+	}
+}
+
+void left_rotate( node* &r )
+{
+	node* temp = r->right;
+	r->right = temp->left;
+	temp->left = r;
+	r = temp;
+	update_size( r->left );
+	update_size( r );
+}
+
+void right_rotate( node* &r )
+{
+	node* temp = r->left;
+	r->left = temp->right;
+	temp->right = r;
+	r = temp;
+	update_size( r->right );
+	update_size( r );
+}
+
+void insert( node* &root, int pos, int newkey )
+{
+	if( root == NULL ) {
+		root = new node( newkey );
+		return;
+	}
+	if( pos < S( root->left ) ) {
+		insert( root->left, pos, newkey );
+		if( root->priority > root->left->priority ) {
+			right_rotate( root );
+		}
+	} else {
+		insert( root->right, pos - S( root->left ) - 1, newkey );
+		if( root->priority > root->right->priority ) {
+			left_rotate( root );
+		}
+	}
+	update_size( root );
+}
+
+int query( node* R, int l, int r, int i, int j )
+{
+	//printf("l -> %d, r -> %d\n", l, r );
+	if( r < i || l > j || R == NULL ) return -INF;
+	else if( i <= l && r <= j ) return A( R );
+	else return max( query( R->left, l, l + S( R->left ), i, j ), query( R->right, l + S( R->left ) + 1, r, i, j ) );
+}
+
+int main( void )
+{
+	node* root = NULL;
+	srand( time( NULL ) );
+	int N;
+	scanf("%d", &N );
+	while( N-- ) {
+		char q[ 10 ];
+		int u, v;
+		scanf("%s%d%d", q, &u, &v );
+		if( q[ 0 ] == 'A' ) insert( root, v - 1, u );
+		else printf("%d\n", query( root, 0, root->size, u - 1, v ) );
+	}
+	return 0;
+}

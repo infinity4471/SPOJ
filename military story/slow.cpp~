@@ -1,0 +1,101 @@
+#include <cstdio>
+#include <algorithm>
+#include <vector>
+ 
+#define MAXN 4001
+#define INF 10000000
+ 
+using namespace std;
+ 
+struct pt {
+	int x,y,idx;
+};
+ 
+pt minim;
+vector< pt > hull;
+ 
+long long CCW( pt A, pt B, pt C )
+{
+	return ( long long )( B.x - A.x ) * ( C.y - A.y ) - ( long long )( C.x - A.x ) * ( B.y - A.y );
+}
+ 
+long long dist( pt A, pt B )
+{
+	return ( long long )( A.x - B.x ) * ( A.x - B.x ) - ( long long )( A.y - B.y ) * ( A.y - B.y );
+}
+ 
+bool cmp( pt A, pt B )
+{
+	long long ccw = CCW( minim, A, B );
+	if( ccw ) {
+		return ccw > 0;
+	}
+	return dist( minim, A ) < dist( minim, B );
+}
+ 
+bool cmp1( pt A, pt B )
+{
+	return A.idx < B.idx;
+}
+ 
+void graham( vector< pt > P )
+{
+	int idx = 0;
+	minim.x = INF;
+	minim.y = INF;
+	for( int i = 0; i < P.size(); i++ ) {
+		if( minim.y > P[ i ].y ) {
+			minim = P[ i ];
+			idx = i;
+		}
+		else if( minim.y == P[ i ].y ) {
+			if( minim.x > P[ i ].x ) {
+				minim = P[ i ];
+				idx = i;
+			}
+		}
+	}
+	sort( P.begin(), P.end(), cmp );
+	for( int i = 0; i < P.size(); i++ ) {
+		while( hull.size() >= 2 && CCW( hull[ hull.size() - 3 ], hull[ hull.size() - 2 ], P[ i ] ) <= 0 ) {
+			hull.pop_back();
+		}
+		hull.push_back( P[ i ] );
+	}
+}
+ 
+int main( void )
+{
+	int N, cnt = 0;
+	scanf("%d", &N );
+	vector< pt > P;
+	for( int i = 0; i < N; i++ ) {
+		pt A;
+		scanf("%d%d", &A.x, &A.y );
+		A.idx = i;
+		P.push_back( A );
+	}
+	while( P.size() >= 3 ) { 
+		while( !hull.empty() ) {
+			hull.pop_back();
+		}
+		graham( P );
+		sort( P.begin(), P.end(), cmp1 );
+		sort( hull.begin(), hull.end(), cmp1 );
+		/*for( int i = 0; i < N; i++ ) {
+			printf("%d\n", P[ i ].idx );
+		}
+		for( int i = 0; i < hull.size(); i++ ) {
+			printf("%d\n", hull[ i ].idx );
+		}*/
+		for( int i = P.size() - 1, j = hull.size() - 1; i >= 0; i-- ) {
+			if( P[ i ].idx == hull[ j ].idx ) {
+				P.erase( P.begin() + i );
+				j--;
+			}
+		}
+		cnt++;
+	}
+	printf("%d\n", cnt );
+	return 0;
+}

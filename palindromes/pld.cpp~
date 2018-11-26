@@ -1,0 +1,83 @@
+#include <cstdio>
+#include <string>
+#include <iostream>
+#include <algorithm>
+#include <set>
+#include <map>
+
+#define MOD 9999999900000001LL
+#define A 256
+
+using namespace std;
+
+typedef long long ll;
+
+multiset< ll > table;
+map< ll, int > tried;
+
+void rolling( string pattern, int K )
+{
+	int N = pattern.length();
+	ll hash = 0, mult = 1;
+	for( int i = 0; i < K; i++ ) {
+		hash = ( ( hash * A ) % MOD + pattern[ i ] ) % MOD;
+		if( hash < 0 ) hash += MOD;
+	}
+	table.insert( hash );
+	for( int i = 0; i < K - 1; i++ ) {
+		mult = ( mult*A ) % MOD;
+		if( mult < 0 ) mult += MOD;
+	}
+	for( int i = K; i < N; i++ ) {
+		hash = ( hash - ( mult*pattern[ i - K ] ) % MOD ) % MOD;
+		hash = hash * A % MOD;
+		hash = ( hash + pattern[ i ] ) % MOD;
+		if( hash < 0 ) hash += MOD;
+		table.insert( hash );
+	}
+}
+
+int check( string pattern, int K )
+{
+	int N = pattern.length(), ans = 0;
+	ll hash = 0, mult = 1;
+	for( int i = 0; i < K; i++ ) {
+		hash = ( ( hash * A ) % MOD + pattern[ i ] ) % MOD;
+		if( hash < 0 ) hash += MOD;
+	}
+	for( int i = 0; i < K - 1; i++ ) {
+		mult = ( mult*A ) % MOD;
+		if( mult < 0 ) mult += MOD;
+	}
+	if( table.find( hash ) != table.end() ) {
+		ans++;
+	}
+	for( int i = K; i < N; i++ ) {
+		hash = ( hash - ( mult*pattern[ i - K ] ) % MOD ) % MOD;
+		hash = hash * A % MOD;
+		hash = ( hash + pattern[ i ] ) % MOD;
+		if( hash < 0 ) hash += MOD;
+		if( table.find( hash ) != table.end() ) {
+				ans++;
+		}
+	}
+	return ans;
+}
+
+int main( void )
+{
+	int K;
+	string pattern, rev;
+	cin >> K;
+	cin >> pattern;
+	if( K > pattern.length() ) {
+		printf("0\n");
+		return 0;
+	}
+	for( int j = pattern.length() - 1; j >= 0 ; j-- ) {
+		rev += pattern[ j ];
+	}
+	rolling( pattern, K );
+	printf("%d\n", check( rev, K ) );
+	return 0;
+}

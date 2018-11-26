@@ -1,0 +1,32 @@
+#include <cstdio>
+#include <algorithm>
+#include <ctime>
+
+using namespace std;
+
+int main( void )
+{
+	srand( time( NULL ) );
+	int ans1 = 0, ans2 = 0, aux = 0;
+	do {
+		ans1 = 0; ans2 = 0; aux = 0;
+		int N = rand() % 3;
+		int A[ N + 1 ];
+		printf("%d\n", N );
+		for( int i = 1; i <= N; i++ ) {
+			A[ i ] = rand() % 1234255;
+			printf("%d ", A[ i ] );
+			aux = aux xor A[ i ];
+			ans1 += A[ i ];
+		}
+		printf("\n");
+		ans1 += aux;
+		for( int i = 1; i < N; i++ ) {
+			for( int j = i + 1; j <= N; j++ ) {
+				ans2 += A[ i ] xor A[ j ];
+			}
+		}
+		printf("ans1 -> %d, ans2 -> %d\n", ans1, ans2 );
+	} while( ans1 == ans2 );
+	return 0;
+}

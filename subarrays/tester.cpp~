@@ -1,0 +1,15 @@
+#include <fstream>
+
+using namespace std;
+
+int main(void)
+{
+	ofstream pfout("sub.in");
+	int N=1000000;
+	pfout << N << endl;
+	for(int i=1; i<=N; i++) {
+		pfout << i << " ";
+	}
+	pfout << 1 << endl;
+	return 0;
+}

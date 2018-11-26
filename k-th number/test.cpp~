@@ -1,0 +1,27 @@
+#include <cstdio>
+#include <ctime>
+#include <algorithm>
+
+using namespace std;
+
+int main( void )
+{
+	freopen("test.in","wt",stdout );
+	srand( time( NULL ) );
+	int N,Q;
+	N = rand() % 100000 + 1;
+	Q = rand() % 5001;
+	printf("%d %d\n", N, Q );
+	for( int i = 1; i <= N; i++ ) {
+		printf("%d ", rand() % 1000000001 );
+	}
+	for( int i = 1; i <= Q; i++ ) {
+		int u,v,k;
+		u = rand() % N + 1;
+		v = rand() % N + 1;
+		k = rand() % N + 1;
+		if( u > v ) swap( u, v );
+		printf("%d %d %d\n", u, v, k );
+	}
+	return 0;
+}

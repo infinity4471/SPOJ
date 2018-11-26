@@ -1,0 +1,88 @@
+#include <cstdio>
+#include <algorithm>
+#include <cstring>
+#include <map>
+
+#define MAXN 101000
+
+using namespace std;
+
+int A[ MAXN + 1 ], B[ MAXN + 1 ];
+int BIT[ MAXN + 1 ];
+map< int, int > M, R;
+
+void add( int x, int val ) {
+    while( x <= MAXN ) {
+        BIT[ x ] += val;
+        x += ( x & -x );
+    }
+}
+
+int get( int x ) {
+    int S = 0;
+    while( x > 0 ) {
+        S += BIT[ x ];
+        x -= ( x & -x );
+    }
+    return S;
+}
+
+int median( int S ) {
+    int lo = 1, hi = MAXN, ans = 0;
+    if( S % 2 ) S = ( S + 1 ) / 2;
+    else S /= 2;
+    //printf("up to what? %d\n", S );
+    while( lo <= hi ) {
+        int mid = ( lo + hi ) / 2;
+        //printf("searching up to %d, sum -> %d\n", mid, get( mid ) );
+        if( get( mid ) <= S ) {
+            ans = mid;
+            lo = mid + 1;
+        } else {
+            hi = mid - 1;
+        }
+    }
+    return ans;
+}
+
+int main() {
+    freopen("test.in","rt",stdin);
+    //freopen("test.out2","wt",stdout);
+    do {
+        int x, n = 0, cnt = 1, size = 0;
+        do {
+           if( scanf("%d", &x ) == EOF ) return 0;
+           if( x == 0 ) break;
+           A[ ++n ] = x;
+           B[ n ] = x;
+        } while( true );
+        sort( A + 1, A + n + 1 );
+        for( int i = 1; i <= n; i++ ) {
+            //printf("A[ %d ] = %d\n", i, A[ i ] );
+            if( A[ i ] != -1 && !M[ A[ i ] ] ) {
+                M[ A[ i ] ] = cnt;
+                R[ cnt ] = A[ i ];
+                //printf("M[ %d ] = %d\n", A[ i ], M[ A[ i ] ] );
+                //printf("R[ %d ] = %d\n", cnt, R[ cnt ] );
+                cnt++;
+            }
+            //printf("\n");
+        }
+        for( int i = 1; i <= n; i++ ) {
+            if( B[ i ] != -1 ) {
+                size++;
+                add( M[ B[ i ] ], 1 );
+            } else {
+                //printf("size -> %d\n", size );
+                int med = median( size );
+                printf("%d\n", R[ med ] );
+                add( med, -1 );
+                size--;
+            }
+        }
+        memset( BIT, 0, sizeof( BIT ) );
+        M.clear();
+        R.clear();
+    } while( true );
+    return 0;
+}

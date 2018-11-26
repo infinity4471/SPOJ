@@ -1,0 +1,77 @@
+#include <cstdio>
+#include <algorithm>
+
+#define MAXN 1010
+
+using namespace std;
+
+int G[ MAXN + 1 ][ MAXN + 1 ][ 2 ], size[ MAXN + 1 ][ 2 ];
+bool visited[ MAXN + 1 ][ 2 ], isthere[ MAXN + 1 ][ MAXN + 1 ];
+
+void update_normal( int u, int v )
+{
+	//printf("running on original graph -> %d, %d is true!\n", u, v );
+	visited[ v ][ 0 ] = true;
+	isthere[ u ][ v ] = true;
+	for( int i = 0; i < size[ v ][ 0 ]; i++ ) {
+		int vv = G[ v ][ i ][ 0 ];
+		if( visited[ vv ][ 0 ] ) continue;  
+		update_normal( u, vv );
+	}
+}
+
+void update_transpose( int u, int v )
+{
+	//printf("running on the transpose -> %d, %d is true!\n", u, v );
+	visited[ v ][ 1 ] = true;
+	isthere[ v ][ u ] = true;
+	for( int i = 0; i < size[ v ][ 1 ]; i++ ) {
+		int vv = G[ v ][ i ][ 1 ];
+		if( visited[ vv ][ 1 ] ) continue;
+		update_transpose( u, vv );
+	}
+}
+
+inline int readint() {
+    int n = 0;
+    char c = getchar_unlocked();
+    while ( !( '0' <= c && c <= '9' ) ) {
+        c = getchar_unlocked();
+    }
+    while ( '0' <= c && c <= '9' ) {
+        n = n * 10 + c - '0';
+        c = getchar_unlocked();
+    }
+    return n;
+}
+
+int main( void )
+{
+	freopen("test.in","rt",stdin);
+	freopen("test2.out","wt",stdout);
+	int N, M, u, v;
+	N = readint();
+	M = readint();
+	for( int i = 1; i <= N; i++ ) isthere[ i ][ i ] = true;
+	while( M-- ) {
+		u = readint();
+		v = readint();
+		//printf("examining edge -> %d,%d\n", u, v );
+		if( isthere[ v ][ u ] ) {
+			printf("%d %d", u, v );
+			puts("");
+			continue;
+		}
+		//printf("it does not cause a cycle!\n");
+		if( isthere[ u ][ v ] ) continue;
+		//printf("it is crucial to the connectivity!\n");
+		for( int i = 1; i <= N; i++ ) visited[ i ][ 0 ] = visited[ i ][ 1 ] = false;
+		G[ u ][ size[ u ][ 0 ]++ ][ 0 ] = v;
+		G[ v ][ size[ v ][ 1 ]++ ][ 1 ] = u;
+		update_normal( u, v );
+		update_transpose( v, u );
+	}
+	printf("0 0");
+	puts("");
+	return 0;
+}

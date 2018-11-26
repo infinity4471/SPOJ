@@ -1,0 +1,98 @@
+#include <iostream>
+#include <sstream>
+#include <string>
+#include <vector>
+#include <deque>
+#include <queue>
+#include <set>
+#include <map>
+#include <algorithm>
+#include <functional>
+#include <utility>
+#include <cmath>
+#include <cstdlib>
+#include <ctime>
+#include <cstdio>
+ 
+using namespace std;
+ 
+#define REP(i,n) for((i)=0;(i)<(int)(n);(i)++)
+#define foreach(c,itr) for(__typeof((c).begin()) itr=(c).begin();itr!=(c).end();itr++)
+ 
+int N;
+pair <int, int> p[100010];
+int a[(1<<17)];
+int id[100010],di[100010];
+ 
+void add(int x, int val){
+	for(int i=x;i<(1<<17);i=((i)|(i+1))) a[i] += val;
+}
+ 
+int sum(int x){
+	int ans = 0;
+	for(int i=x;i>0;i=((i)&(i-1))) ans += a[i-1];
+	return ans;
+}
+ 
+int func(int x){ // find first index s.t. sum >= x
+	if(sum(N) < x) return N+1;
+	
+	int low = 0, high = (1<<17), lowsum = 0, highsum = a[high-1];
+	
+	int i;
+	REP(i,17){
+		int mid = ((low + high) >> 1), midsum = lowsum + a[mid-1];
+		if(midsum >= x){
+			high = mid; highsum = midsum;
+		} else {
+			low = mid; lowsum = midsum;
+		}
+	}
+	
+	return high;
+}
+ 
+int main(void){
+	//freopen("test.in","rt",stdin);
+       //	freopen("test2.out","wt",stdout);
+	int Q,i;
+	
+	scanf("%d%d",&N,&Q);
+	REP(i,N) scanf("%d",&p[i].first);
+	
+	REP(i,N) p[i].second = i;
+	sort(p,p+N);
+	REP(i,N) add(i, p[i].first - ((i == 0) ? 0 : p[i-1].first));
+	REP(i,N) id[p[i].second] = i;
+	REP(i,N) di[i] = p[i].second;
+	
+	REP(i,Q){
+		int type,x;
+		scanf("%d%d",&type,&x);
+		
+		if(type == 1){ // x-th ++
+			x--;
+			int s = sum(id[x]+1);
+			int y = di[func(s+1) - 2];
+			swap(id[x],id[y]);
+			di[id[x]] = x; di[id[y]] = y;
+			add(id[x],1); if(id[x]+1 < N) add(id[x]+1,-1);
+		}
+		
+		if(type == 2){ // count at least x
+			int p = func(x);
+			printf("%d\n",N+1-p);
+		}
+		
+		if(type == 3){ // at least x -> -1
+			int p = func(x);
+			if(p != N+1) add(p-1,-1);
+		}
+		
+	//	int j;
+	//	REP(j,N) cout << sum(j+1) << ' ';
+	//	cout << endl;
+	}
+	
+	return 0;
+}

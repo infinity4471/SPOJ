@@ -1,0 +1,278 @@
+/*
+PROB: PT07F
+LANG: C++
+*/
+#include <iostream>
+#include <vector>
+#include <string>
+#include <set>
+#include <cstring>
+#include <queue>
+#include <ctime>
+#include <cstdio>
+#include <cmath>
+#include <algorithm>
+#define foreach(_var,_container) for( typeof( (_container).begin() ) _var = (_container).begin() ; _var != (_container).end() ; ++_var )
+#define now() double( double( clock() ) / double( CLOCKS_PER_SEC ) )
+#if 0
+#define eprintf(msg, ... ) fprintf(stderr," %s:%d in %s at %.4lf :: " msg "\xA" , strrchr( __FILE__ , '/' )+1 , __LINE__ , __FUNCTION__ , now() , ##__VA_ARGS__ )
+#else
+#define eprintf(msg, ... ) 0
+#endif
+#define pprintf(msg, ... ) fprintf(stderr," %s:%d in %s at %.4lf :: " msg "\xA" , strrchr( __FILE__ , '/' )+1 , __LINE__ , __FUNCTION__ , now() , ##__VA_ARGS__ )
+ 
+using namespace std;
+ 
+const int MAXN = 10007;
+const int INF = 1 << 28;
+ 
+int N,T;
+ 
+vector< int > next[MAXN];
+ 
+int len;
+int sorted[MAXN];
+ 
+int dp[MAXN][2];
+int best[MAXN];
+int best2[MAXN];
+ 
+int best2prev[MAXN];
+ 
+int prev[MAXN][2][4];
+ 
+int pathsize = 0;
+vector<int> path[MAXN];
+ 
+inline void setPrev( int node , int mode , int prev_node 
+                        , int prev_mode , int prev_node2 = -1 , int prev_mode2 = -1 ){
+    prev[node][mode][0] = prev_node;
+    prev[node][mode][1] = prev_mode;
+    
+    prev[node][mode][2] = prev_node2;
+    prev[node][mode][3] = prev_mode2;
+}
+ 
+void toposort( int node , int parent ){
+    int parentloc = -1;
+    
+    for( int i = 0 ; i < next[node].size() ; i++ ){
+        if( parent == next[node][i] ){
+            parentloc = i;
+            continue;
+        }
+        
+        toposort( next[node][i] , node );
+    }
+    
+    sorted[len++] = node;
+    
+    if( parentloc != -1 )
+        next[node].erase( next[node].begin() + parentloc );
+}
+ 
+void init(){
+    memset( dp , 0 , sizeof( dp ) );
+    
+    memset( sorted , 0 , sizeof( sorted ) );
+    
+    memset( prev , -1 , sizeof( prev ) );
+    
+    memset( best , 0 , sizeof( best ) );
+    memset( best2 , 0 , sizeof( best2 ) );
+    
+    len = 0;
+    
+    for( int i = 0 ; i < N ; i++ )
+        next[i].clear();
+    
+    for( int i = 0 ; i <= pathsize ; i++ )
+        path[i].clear();
+    
+    pathsize = 0;
+}
+ 
+void prepare( int node ){
+    best[0] = min( dp[ next[node][0] ][0] , dp[ next[node][0] ][1] );
+    
+    for( int i = 1 ; i < next[node].size() ; i++ ){
+        best[i] = best[i-1] + min( dp[ next[node][i] ][0] , dp[ next[node][i] ][1] );
+    }
+}
+ 
+int findrest( int node , int except ){
+    /**
+     * Returns best[0..except-1] + best[except+1..end]
+     *   + the price of all tickets bought additionally
+     */
+    return next[node].size() - 1 + best[ next[node].size() - 1 ] 
+        - min( dp[ next[node][except] ][0] , dp[ next[node][except] ][1] );
+}
+ 
+void prepare2( int node ){
+    /**
+     * Calculates best2[]
+     * Optimize  dp[ next[node][i] ][0] + dp[ next[node][j] ][0] + findrest( node , i , j ) );
+     *
+     *  best2[i] = min( dp[ next[node][i..end] ]
+     */
+    int last = next[node].size() - 1;
+    
+    best2[last] = dp[ next[node][last] ][0] 
+                        - min( dp[ next[node][last] ][0] , dp[ next[node][last] ][1] );
+    
+    best2prev[last] = next[node][last];
+    
+    for( int i = last-1 ; i >= 0 ; i-- ){
+        if( best2[i+1] > dp[ next[node][i] ][0] 
+                            - min( dp[ next[node][i] ][0] , dp[ next[node][i] ][1] ) ){
+            best2[i] = dp[ next[node][i] ][0]
+                            - min( dp[ next[node][i] ][0] , dp[ next[node][i] ][1] );
+            best2prev[i] = next[node][i];
+        }else{
+            best2[i] = best2[i+1];
+            best2prev[i] = best2prev[i+1];
+        }
+    }
+}
+ 
+void solve(){
+    for( int node_idx = 0 ; node_idx < len ; node_idx++ ){
+        int &node = sorted[node_idx];
+        
+        eprintf("Solving for node %d", 1+node);
+        
+        if( next[node].size() == 0 ){
+            dp[node][0] = 0;
+            dp[node][1] = INF;
+            
+            setPrev( node , 0 , -1 , -1 );
+            setPrev( node , 1 , -1 , -1 );/// no next
+            continue;
+        }
+        
+        /**
+         * Calculate DP[node][0]
+         *  Choose the best continuation from here
+         */
+        
+        prepare( node );
+        
+        dp[node][0] = best[ next[node].size() - 1 ] + next[node].size();/// don't select anything
+        
+        setPrev( node , 0 , -1 , -1 );
+        
+        for( int i = 0 ; i < next[node].size() ; i++ ){
+            if( dp[node][0] > dp[ next[node][i] ][0] + findrest( node , i ) ){
+                dp[node][0] = dp[ next[node][i] ][0] + findrest( node , i );
+                
+                setPrev( node , 0 , next[node][i] , 0 );
+            }
+        }
+        
+        eprintf("DP[%d][0] = %d", 1+node, dp[node][0] );
+        
+        /**
+         * Calculate DP[node][1]
+         *  Choose the best
+         */
+        
+        if( next[node].size() <= 1 ){
+            dp[node][1] = INF;
+            continue;
+        }
+        
+        prepare2( node );
+        
+        dp[node][1] = best[ next[node].size() - 1 ] + next[node].size();
+        
+        setPrev( node , 1 , -1 , -1 );
+        
+        for( int i = 0 ; i < next[node].size() - 1 ; i++ ){
+            int common = dp[ next[node][i] ][0] + best[ next[node].size() - 1 ];
+            
+            common += next[node].size() - 2 
+                - min( dp[ next[node][i] ][0] , dp[ next[node][i] ][1] );
+            
+            if( dp[node][1] > best2[i+1] + common ){
+                dp[node][1] = best2[i+1] + common;
+                
+                setPrev( node , 1 , best2prev[i+1] , 0 , next[node][i] , 0 );
+            }
+            
+        }
+        
+        eprintf("DP[%d][1] = %d", 1+node, dp[node][1] );
+    }
+}
+ 
+void findPath( int pathId , int node , int mode ){
+    if( node != -1 and mode != -1 ){
+        if( mode == 0 ){
+            path[ pathId ].push_back( node );
+            findPath( pathId , prev[node][mode][0] , prev[node][mode][1] );
+        }else{
+            findPath( pathId , prev[node][mode][0] , prev[node][mode][1] );
+            path[ pathId ].push_back( node );
+            findPath( pathId , prev[node][mode][2] , prev[node][mode][3] );
+        }
+    }else{
+        return;
+    }
+    
+    for( int i = 0 ; i < next[node].size() ; i++ ){
+        if( next[node][i] != prev[node][mode][0] and next[node][i] != prev[node][mode][2] ){
+            if( dp[ next[node][i] ][0] < dp[ next[node][i] ][1] )
+                findPath( ++pathsize , next[node][i] , 0 );
+            else
+                findPath( ++pathsize , next[node][i] , 1 );
+        }
+    }
+}
+ 
+int main( int argc, char* argv[] ){
+	freopen("PT07F.in" , "r" , stdin );
+	//freopen("PT07F.out" , "w" , stdout );
+ 
+    scanf("%d", &T);
+    
+    for( int test = 0 ; test < T ; test++ ){
+        scanf("%d", &N);
+        
+        init();
+        
+        for( int i = 0 ; i < N-1 ; i++ ){
+            int u,v;
+            scanf("%d %d", &u, &v);
+            
+            --u,--v;
+            
+            next[u].push_back( v );
+            next[v].push_back( u );
+        }
+        
+        toposort( 0 , -1 );
+        
+        solve();
+        
+        printf("%d\n", min( dp[0][0] , dp[0][1] ) + 1 );
+        
+        if( dp[0][0] < dp[0][1] )
+            findPath( 0 , 0 , 0 );
+        else
+            findPath( 0 , 0 , 1 );
+     
+        for( int i = 0 ; i <= pathsize ; i++ ){
+            for( int j = 0 ; j < path[i].size() ; j++ ){
+                if( j != 0 )
+                    printf(" ");
+                
+                printf("%d", 1 + path[i][j] );
+            }
+            printf("\n");
+        }
+    }
+ 
+	fprintf( stderr , "Total runtime: %.4lf\xA", now() );
+	return 0;
+}

@@ -1,0 +1,30 @@
+#include <cstdio>
+#include <algorithm>
+#include <ctime>
+
+using namespace std;
+
+int main( void )
+{
+	srand( time( NULL ) );
+	int N = 100000;
+	freopen("test.in","wt",stdout);
+	for( int k = 0; k < 100; k++ ) { 
+		for( int i = 0; i < N; i++ ) {
+			int c = rand() % 26;
+			printf("%c", ( char )( c + 'a' ) );
+		}
+		printf("\n");
+		for( int i = 0; i < N; i++ ) {
+			int c = rand() % 26;
+			printf("%c", ( char )( c + 'a' ) );
+		}
+		printf("\n");
+		for( int i = 0; i < N; i++ ) {
+			int c = rand() % 26;
+			printf("%c", ( char )( c + 'a' ) );
+		}
+		printf("\n");
+	}
+	return 0;
+}

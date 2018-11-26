@@ -1,0 +1,16 @@
+query !!!! type -> 1, u - >4, v -> 11
+query !!!! type -> 0, u - >15, v -> 16
+0
+query !!!! type -> 0, u - >5, v -> 12
+1
+query !!!! type -> 1, u - >6, v -> 14
+query !!!! type -> 2, u - >2, v -> 0
+query !!!! type -> 1, u - >17, v -> 19
+query !!!! type -> 2, u - >3, v -> 0
+query !!!! type -> 2, u - >1, v -> 0
+query !!!! type -> 0, u - >18, v -> 20
+0
+query !!!! type -> 1, u - >7, v -> 8
+query !!!! type -> 1, u - >10, v -> 13
+query !!!! type -> 0, u - >1, v -> 9
+1

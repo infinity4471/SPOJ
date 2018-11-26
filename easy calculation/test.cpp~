@@ -1,0 +1,11 @@
+#include <cstdio>
+
+int main(void)
+{
+	freopen("easy.in","wt",stdout);
+	printf("100\n");
+	for(int i=0; i<100; i++) {
+		printf("100000 100000 100000\n");
+	}
+	return 0;
+}

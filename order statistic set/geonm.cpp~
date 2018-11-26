@@ -1,0 +1,104 @@
+#include<iostream>
+#include<stdio.h>
+ 
+using namespace std;
+ 
+#define MAXN 4*24*100009
+ 
+int T[MAXN],lf[MAXN],r[MAXN],nodeCount=2;
+ 
+int Left(int v) {
+        if (lf[v]==0)
+                lf[v]=nodeCount++;
+                return lf[v];
+}
+ 
+int Right(int v) {
+        if (r[v]==0)
+                r[v]=nodeCount++;
+                return r[v];
+}
+ 
+void update(int node,int s,int e,int val,int ers) {
+        int mid=(s+e)/2;
+       
+        if (s==e) {
+                if (ers)
+                T[node]++;
+                else
+                if (T[node])
+                        T[node]--;
+                return;
+        }
+       
+        if (val<=mid)
+                update(Left(node),s,mid,val,ers);
+        else
+                update(Right(node),mid+1,e,val,ers);
+       
+                T[node]=T[Left(node)]+T[Right(node)];
+}
+ 
+int Kth (int node,int s,int e,int k) {
+        int mid=(s+e)/2;
+       
+        if (s==e) {
+                return s;
+        }
+       
+        if (T[Left(node)]>=k)
+                return Kth(Left(node),s,mid,k);
+        else
+                return Kth(Right(node),mid+1,e,k-T[Left(node)]);
+}
+ 
+int Rank(int node,int s,int e,int i,int j) {
+        int mid=(s+e)/2;
+       
+        if (s==i&&e==j) {
+                return T[node];
+        }
+       
+        if (j<=mid)
+                return Rank(Left(node),s,mid,i,j);
+        else
+        if (mid<i)
+                return Rank(Right(node),mid+1,e,i,j);
+        else
+                return Rank(Left(node),s,mid,i,mid)+Rank(Right(node),mid+1,e,mid+1,j);
+}
+ 
+       
+ 
+int main () {
+
+        int N,Q;
+       
+        scanf("%d%d",&N,&Q);
+       
+        for (int i=0;i<N;i++) {
+                int x;
+                scanf("%d",&x);
+                update(1,-100,100,x,1);
+        }
+ 
+       
+        for (int i=0;i<Q;i++) {
+                int s,x;
+                scanf("%d%d",&s,&x);
+                if (s==0||s==1) {
+                        update(1,-1e9,1e9,x,s);
+                }
+                if (s==2) {
+                        if (x!=1)
+                        printf("%d\n",Rank(1,-1e9,1e9,1,x-1)+1);
+                        else
+                        printf("1\n");
+                }
+                if (s==3) {
+                        printf("%d\n",Kth(1,-1e9,1e9,x));
+                }
+               
+        }
+        return 0;
+}

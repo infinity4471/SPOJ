@@ -1,0 +1,17 @@
+#include <cstdio>
+
+int main( void )
+{
+	freopen("test.in","wt",stdout);
+	printf("100 5000\n");
+	for( int i = 0; i < 5000; i++ ) {
+		for( int j = 1; j <= 5000; j++ ) {
+			if( i != j ) {
+				printf("%d ",j);
+			}
+		}
+		printf("\n");
+	}
+	printf("0 0\n");
+	return 0;
+}

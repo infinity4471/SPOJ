@@ -1,0 +1,50 @@
+#include <cstdio>
+#include <queue>
+#include <vector>
+
+using namespace std;
+
+int main(void)
+{
+	int V,E,u,v,prev=0;
+	scanf("%d%d",&V,&E);
+	bool circle=false;
+	vector<int> graph[V+1];
+	bool visited[V+1];
+	queue<int> Q;
+	for(int i=0; i<=V; i++)
+		visited[i]=false;
+	for(int i=0; i<E; i++)
+	{
+		scanf("%d%d",&u,&v);
+		graph[u].push_back(v);
+		graph[v].push_back(u);
+	}
+	int min=1;
+	for(int i=1; i<=V; i++)
+	{
+		if(graph[i].size())
+		{
+			min=i;
+			break;
+		}
+	}
+	Q.push(min);
+	while(!Q.empty())
+	{
+		int p=Q.front();
+		Q.pop();
+		if(p==prev) continue;
+		if(visited[p])
+		{
+			circle=true;
+			break;
+		}
+		visited[p]=true;
+		for(int i=0; i<graph[p].size(); i++)
+				if(graph[p].at(i)!=prev) Q.push(graph[p].at(i));
+		prev=p;
+	}
+	printf("%s\n",circle?"NO":"YES");
+	return 0;
+}

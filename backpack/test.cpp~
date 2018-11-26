@@ -1,0 +1,11 @@
+#include <cstdio>
+
+int main( void )
+{
+	printf("1\n32000 60\n");
+	printf("1 1 0\n");
+	for(int i = 1; i <= 59; i++ ) {
+		printf("1 1 1\n");
+	}
+	return 0;
+}

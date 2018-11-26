@@ -1,0 +1,35 @@
+#include <cstdio>
+#include <algorithm>
+#include <ctime>
+
+using namespace std;
+
+int main( void )
+{
+	freopen("ccost.txt","wt",stdout );
+	printf("1\n");
+		printf("100000\n");
+		srand( time( NULL ) );
+		for( int i = 0; i < 100000; i++ ) {
+			int x = rand() % 10000001;
+			int y = rand() % 10000001;
+			int val = rand() % 10001;
+			printf("%d %d %d\n", x, y, val );
+		}
+		printf("50000\n");
+		for( int i =0; i < 50000; i++ ) {
+			int x1,x2,y1,y2;
+			x1 = rand() % 10000001;
+			y1 = rand() % 10000001;
+			x2 = rand() % 10000001;
+			y2 = rand() % 10001;
+			if( x1 > x2 ) {
+				swap( x1, x2 );
+			}
+			if( y1 > y2 ) {
+				swap( y1, y2 );
+			}
+			printf("%d %d %d %d\n", x1, y1, x2, y2 );
+		}
+	return 0;
+}		

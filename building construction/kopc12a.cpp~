@@ -1,0 +1,60 @@
+#include <cstdio>
+#include <algorithm>
+#include <utility>
+#include <cmath>
+ 
+#define MAXN 10000
+ 
+using namespace std;
+ 
+typedef pair< int ,int > pii;
+ 
+pii BD[ MAXN + 1 ];
+int N;
+ 
+long long function( int k )
+{
+	long long cost = 0;
+	for( int i = 1; i <= N; i++ ) {
+		 cost += ( long long )fabs(BD[ i ].second -  BD[ k ].second ) * BD[ i ].first;
+	}
+	//printf("cost to transform all buildings to -> %d = %d\n", BD[ k ].second, cost );
+	return cost;
+}
+ 
+long long search( int i, int j )
+{
+	long long ans;
+	while( j - i >= 3 ) {
+		int k = ( 2*i + j ) / 3;
+		int l = ( 2*j + i ) / 3;
+		if( function( k ) > function( l ) ) {
+			i = k;
+		} else {
+			j = l;
+		}
+	}
+	ans = function( i );
+	for( int k = i + 1; k <= j; k++ ) {
+		ans = min( ans, function( k ) );
+	}
+	return ans;
+}
+ 
+int main( void )
+{
+	int T;
+	scanf("%d",&T);
+	while( T-- ) {
+		scanf("%d",&N);
+		for( int i = 1; i <= N; i++ ) {
+			scanf("%d",&BD[ i ].second);
+		}
+		for( int i = 1; i <= N; i++ ) {
+			scanf("%d",&BD[ i ].first );
+		}
+		sort( BD + 1, BD + N + 1 );
+		printf("%lld\n", search( 1, N ) );
+	}
+	return 0;
+}

@@ -1,0 +1,70 @@
+#include <iostream>
+#include <sstream>
+#include <bitset>
+#include <cstdio>
+#include <string>
+#include <cstring>
+#include <vector>
+#include <queue>
+#include <stack>
+#include <set>
+#include <map>
+#include <algorithm>
+#include <cmath>
+#include <cstdlib>
+#include <cctype>
+#include <numeric>
+#define FOR(i,A) for(typeof (A).begin() i = (A).begin() ; i != (A).end() ; i++)
+#define mp make_pair
+#define debug( x ) cout << #x << " = " << x << endl
+#define clr(v,x) memset( v, x , sizeof v )
+#define all(x) (x).begin() , (x).end()
+#define rall(x) (x).rbegin() , (x).rend()
+#define f(i,a,b) for(int i = a ; i < b ; i++)
+#define fd(i,a,b) for(int i = a ; i >= b ; i--)
+#define TAM 110
+ 
+using namespace std;
+ 
+typedef pair<int,int> ii ;
+typedef long long ll ;
+typedef long double ld ;
+typedef pair<int,ii> pii ;
+ 
+ii dp[ 20 ][ 1<<20 ] ;
+int n ;
+int v[ TAM ] ;
+ 
+ii calc( int x , int mask ){
+        ii & resp = dp[ x ][ mask ] ;
+        if( resp.first != -1 ) return resp ;
+ 
+        if( mask == ((1<<n)-1) ) return mp( v[ x ] + n , 1 ) ;
+ 
+        resp = mp( 0 , 1 ) ;
+        f( i , 1 , n +1 ){
+                if( mask & (1<<(i-1)) ) continue ;
+                ii aux = calc( i , mask | (1<<(i-1)) ) ;
+                aux.first += ( abs( v[ x ] - v[ i ] ) + 1 ) ;
+                if( aux.first > resp.first )
+                        resp = aux ;
+                else if( aux.first == resp.first )
+                        resp.second++ ;
+        }
+ 
+        return resp ;
+}
+ 
+int main(){
+ 
+        while( scanf("%d" , &n ) == 1 ){
+                if( n == 0 ) break ;
+                f( i , 1 , n + 1 ) scanf("%d" , &v[ i ] ) ;
+                v[ 0 ] = 0 ;
+ 
+                f( i , 0 , n + 1 ) f( j , 0 , 1<<n ) dp[ i ][ j ] = mp( -1 , -1 ) ;
+                ii R = calc( 0 , 0 ) ;
+                printf("%d %d\n" , R.first ,R.second ) ;
+        }
+    return 0 ;
+}

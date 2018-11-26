@@ -1,0 +1,43 @@
+#include <cstdio>
+
+#define MAXN 1000
+#define M 4
+
+long long memo[ MAXN + 1 ][ 1 << M ];
+
+long long dp( int i, int bitmask )
+{
+	if( memo[ i ][ bitmask ] != -1 ) {
+		return memo[ i ][ bitmask ];
+	}
+	if( i == 1 ) {
+		memo[ i ][ bitmask ] = 1;
+	} else {
+		memo[ i ][ bitmask ] = dp( i - 1, ( 1 << M ) - 1 );
+		for( int j = 0; j < M; j++ ) {
+			if( bitmask & ( 1 << j ) ) {
+				memo[ i ][ bitmask ] += dp( i - 1, ( ( 1 << M ) - 1 ) - ( 1 << j ) );
+			}
+		}
+	}
+	return memo[ i ][ bitmask ];
+}
+
+int main( void )
+{
+	for( int i = 0; i <= MAXN; i++ ) {
+		for( int j = 0; j < 1 << M; j++ ) {
+			memo[ i ][ j ] = -1;
+		}
+	}
+	int fullstate = 1 << M;
+	dp( 1000, fullstate - 1 );
+	int T;
+	scanf("%d", &T );
+	while( T-- ) {
+		int N;
+		scanf("%d", &N );
+		printf("%lld\n", memo[ N ][ fullstate - 1 ] );
+	}
+	return 0;
+}

@@ -1,0 +1,45 @@
+#include <cstdio>
+#include <algorithm>
+
+using namespace std;
+
+int main( void )
+{
+	int N,Q = -1;
+	scanf("%d", &N );
+	bool L[ N + 1 ];	
+	for( int i = 0; i <= N; i++ ) {
+		L[ i ] = true;
+	}
+	while( true ) {
+		scanf("%d", &Q );
+		if( !Q ) {
+			break;
+		}
+		if( Q == 1 ) {
+			for( int i = 1; i <= N; i++ ) {
+				L[ i ] = !L[ i ];
+			}
+		}
+		else if( Q == 2 ) {
+			for( int i = 1; i <= N; i+= 2 ) {
+				L[ i ] = !L[ i ];
+			}
+		}
+		else if( Q == 3 ) {
+			for( int i = 1; 2*i <= N; i++ ) {
+				L[ 2*i ] = !L[ 2*i ];
+			}
+		}
+		else if( Q == 4 ) {
+			for( int i = 0; 3*i + 1 <= N; i++ ) {
+				L[ 3*i + 1 ] = !L[ 3*i + 1 ];
+			}
+		}
+		for( int i = 1; i <= N; i++ ) {
+			printf("%d", L[ i ] );
+		}
+		printf("\n");
+	}
+	return 0;
+}

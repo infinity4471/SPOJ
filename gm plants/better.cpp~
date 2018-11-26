@@ -1,0 +1,50 @@
+#include <cstdio>
+#include <algorithm>
+
+#define MAXN 100
+
+using namespace std;
+
+int X[ MAXN + 1 ], Y[ MAXN + 1 ], NX, NY;
+
+void update_X( int x1, int x2 ) {
+    for( int i = x1; i <= x2; i++ ) {
+        X[ i ] = 1 - X[ i ];
+    }
+}
+
+void update_Y( int y1, int y2 ) {
+    for( int i = y1; i <= y2; i++ ) {
+        Y[ i ] = 1 - Y[ i ];
+    }
+}
+
+int area( int x1, int y1, int x2, int y2 ) {
+    int sum1 = 0, sum2 = 0;
+    int n1 = x2 - x1 + 1, n2 = y2 - y1 + 1;
+    for( int i = x1; i <= x2; i++ ) sum1 += X[ i ];
+    for( int i = y1; i <= y2; i++ ) sum2 += Y[ i ];
+    //printf("sum1 -> %d, sum2 -> %d\n", sum1, sum2 );
+    return sum1 * ( y2 - y1 + 1 ) + sum2 * ( x2 - x1 + 1 ) - 2 *sum1 * sum2;
+}
+
+int main() {
+    int Q;
+    scanf("%d%d%d", &NX, &NY, &Q );
+    while( Q-- ) {
+        int q, x1, y1, x2, y2;
+        scanf("%d", &q );
+        if( q == 0 ) {
+            scanf("%d%d", &x1, &x2 );
+            update_X( x1,x2 );
+        }
+        else if( q == 1 ) {
+            scanf("%d%d", &y1, &y2 );
+            update_Y( y1, y2 );
+        } else {
+            scanf("%d%d%d%d", &x1, &y1, &x2, &y2 );
+            printf("%d\n", area( x1, y1, x2, y2 ) );
+        }
+    }
+    return 0;
+}

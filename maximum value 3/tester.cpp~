@@ -1,0 +1,26 @@
+#include <cstdio>
+#include <algorithm>
+#include <ctime>
+
+using namespace std;
+
+int main( void )
+{
+	freopen("test.in","rt",stdin);
+	int N = rand() % 100000 + 1, cnt = 0;
+	printf("%d\n", N );
+	while( N-- ) {
+		int u = rand() % 2;
+		if( u == 0 ) {
+			printf("A");
+			int v = rand() % 2000000000 - 1000000000, w = rand() % ( cnt + 1 ) + 1;
+			printf(" %d %d\n", v, w );
+		} else {
+			printf("Q");
+			int v = rand() % ( cnt + 1 ) + 1, w = rand() % ( cnt + 1 ) + 1;
+			if( v > w ) swap( v, w );
+			printf(" %d %d\n", v, w );
+		}
+	}
+	return 0;
+}

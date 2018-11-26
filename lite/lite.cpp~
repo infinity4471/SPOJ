@@ -1,0 +1,118 @@
+#include <iostream>
+#include <algorithm>
+ 
+#define MAX 100000
+ 
+using namespace std;
+ 
+struct node {
+	int i,j;
+	int on,num;
+};
+ 
+node tree[4*MAX+1];
+bool flag[4*MAX+1];
+int N;
+ 
+void unflag(int node)
+{
+	int i=tree[node].i;
+	int j=tree[node].j;
+	//printf("unflagging node %d [%d,%d]\n",node,i,j);
+	tree[node].on=tree[node].num-tree[node].on;
+	//printf("tree[%d].on=%d\n",node,tree[node].on);
+	flag[node]=false;
+	//printf("flag[%d]=false\n",node);
+	if(i<j) {
+		flag[2*node]= !flag[2*node];
+		flag[2*node+1]= !flag[2*node + 1];
+		//printf("flag[%d] -> [%d,%d]=%d\n",2*node,i,(i+j)/2,flag[2*node]);
+		//printf("flag[%d] -> [%d,%d]=%d\n",2*node+1,(i+j)/2+1,j,flag[2*node+1]);
+	}
+}
+ 
+void init(int node,int l,int r)
+{
+	if(l==r) {
+		tree[node].on=0;
+		tree[node].num=1;
+		tree[node].i=l;
+		tree[node].j=r;
+		flag[node]=false;
+		return;
+	}
+	else {
+		int mid=(l+r)/2;
+		init(2*node,l,mid);
+		init(2*node+1,mid+1,r);
+		tree[node].i=l;
+		tree[node].j=r;
+		flag[node]=false;
+		tree[node].num=tree[2*node].num + tree[2*node+1].num;
+		//printf("tree[%d].num=%d distema is[%d,%d]\n",node,tree[node].num,tree[node].i,tree[node].j);
+		tree[node].on=0;
+	}
+}
+ 
+void update(int node,int l,int r)
+{
+	int i=tree[node].i;
+	int j=tree[node].j;
+	//printf("updating diastema [%d,%d]\n",i,j);
+	if( j<l || r<i) {
+		//printf("diastema [%d,%d] is outside [%d,%d], exiting\n",i,j,l,r);
+		unflag(node);
+	}
+	else if ( l<=i && j<=r ) {
+		//printf("diastema [%d,%d] is completely inside diastema [%d,%d]\n",i,j,l,r);
+		flag[node ] = !flag[node];
+		unflag(node);
+	}
+	else {
+		unflag(node);
+		update(2*node,l,r);
+		update(2*node+1,l,r);
+		if(l!=r) {
+			tree[node].on=tree[2*node].on+tree[2*node+1].on;
+		}
+	}
+}
+long long query(int node,int l,int r)
+{
+	int i=tree[node].i;
+	int j=tree[node].j;
+	// printf("querying diastema [%d,%d]\n",i,j);
+	if( j<l || r<i) {
+		//printf("diastema [%d,%d] is outside [%d,%d], exiting\n",i,j,l,r);
+		return 0;
+	}
+	unflag(node);
+	if(l<=i && j<=r) {
+		//printf("diastema [%d,%d] is completely inside diastema [%d,%d]\n",i,j,l,r);
+		//printf("returning tree[%d].on=%d\n",node,tree[node].on);
+		return tree[node].on;
+	}
+	else {
+		return query(2*node,l,r) + query(2*node+1,l,r);
+	}
+}
+ 
+int main(void)
+{
+	int M;
+	cin >> N >> M;
+	int u,v,w;
+	init(1,1,N);
+	for(int i=0; i<=4*MAX+1; i++) {
+		flag[i]=false;
+	}
+	for(int i=0; i<M; i++) {
+		cin >> u >> v >> w;
+		if(u==0) {
+			update(1,v,w);
+		} else {
+			cout << query(1,v,w) << endl;	
+		}
+	}
+	return 0;
+}

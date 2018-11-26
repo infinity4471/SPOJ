@@ -1,0 +1,31 @@
+#include <cstdio>
+#include <algorithm>
+
+using namespace std;
+
+int main( void )
+{
+	freopen("test.in","rt",stdin );
+	//int T;
+	//scanf("%d", &T );
+	//while( T-- ) {
+		int N, u, a, b, c;
+		scanf("%d%d%d%d", &N, &a, &b, &c );
+		long long S[ N + 1 ], dp[ N + 1 ];
+		S[ 0 ] = 0;
+		for( int i = 1; i <= N; i++ ) {
+			scanf("%d", &u );
+			S[ i ] = S[ i - 1 ] + ( long long )u;
+		}
+		dp[ 0 ] = 0;
+		for( int i = 1; i <= N; i++ ) {
+			dp[ i ] = 0;
+			for( int j = i - 1; j >= 0; j-- ) {
+				long long s = S[ i ] - S[ j ];
+				dp[ i ] = max( dp[ i ], dp[ j ] + ( long long ) a*s*s + ( long long )b*s + ( long long )c );
+			}
+		}
+		printf("%lld\n", dp[ N ] );
+	}
+	return 0;
+}

@@ -1,0 +1,38 @@
+#include <cstdio>
+#include <algorithm>
+#include <ctime>
+
+using namespace std;
+
+int main( void )
+{
+	srand( time( NULL ) );
+	int T = rand() % 15;
+	while( T-- ) {
+		int N = rand() % 50 + 1;
+		int T = rand() % 1000 + 1;
+		printf("%d %d\n", N, T );
+		for( int i = 1; i <= N; i++ ) {
+			for( int j = 1; j <= N; j++ ) {
+				if( i == j ) printf("0 ");
+				else {
+					int u = rand() % 1000 + 1;
+					printf("%d ", u );
+				}
+			}
+			printf("\n");
+		}
+		for( int i = 1; i <= N; i++ ) {
+			for( int j = 1; j <= N; j++ ) {
+				if( i == j ) printf("0 ");
+				else {
+					int u = rand() % 1000 + 1;
+					printf("%d ", u );
+				}
+			}
+			printf("\n");
+		}
+	}
+	printf("0 0\n");
+	return 0;
+}

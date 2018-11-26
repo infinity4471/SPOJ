@@ -1,0 +1,82 @@
+#include <cstdio>
+#include <vector>
+#include <algorithm>
+#include <queue>
+
+using namespace std;
+
+struct pos {
+    int x;
+    int y;
+};
+
+int min( int a, int b ) {
+    if ( a > b ) {
+        return b;
+    }
+    return a;
+}
+
+bool operator <( pos a, pos b ) {
+    if ( a.x == b.x ) {
+        return a.y > b.y;
+    }
+    return a.x > b.x;
+}
+
+int p[ 10001 ], d[ 10001 ], low[ 10001 ];
+bool visited[ 10001 ], bridge[ 10001 ];
+vector< int > graph[ 10001 ];
+priority_queue< pos > sol;
+
+void dfsVisit( int S, int depth ) {
+    d[ S ] = low[ S ] = depth;
+    visited[ S ] = true;
+    for ( int i = 0; i < graph[ S ].size(); ++i ) {
+        int v = graph[ S ][ i ];
+        if ( !visited[ v ] ) {
+            p[ v ] = S;
+            dfsVisit( v, depth + 1 );
+            low[ S ] = min( low[ S ], low[ v ] );
+            if ( low[ v ] > depth ) {
+                sol.push( ( pos ) { min( S, v ), max( S, v ) } );
+            }
+        }
+        else if ( p[ S ] != v ) {
+            low[ S ] = min( low[ S ], d[ v ] );
+        }
+    }
+}
+
+void dfs( int N ) {
+    for ( int i = 0; i < N; ++i ) {
+        if ( !visited[ i ] ) {
+            dfsVisit( i, 0 );
+        }
+    }
+}
+
+int main() {
+    int t, N, M, u, v, i, k, lim, j;
+    scanf( "%d", &t );
+    for ( k = 1; k <= t; ++k ) {
+        scanf( "%d%d", &N, &M );
+        for ( i = 0; i < N; ++i ) {
+            graph[ i ].clear();
+            p[ i ] = -1;
+            visited[ i ] = bridge[ i ] = false;
+        }
+        for ( i = 0; i < M; ++i ) {
+            scanf("%d%d", &u, &v );
+	    graph[ u ].push_back( v );
+	    graph[ v ].push_back( u );
+        }
+        dfs( N );
+        printf( "Case %d:\n%d critical links\n", k, sol.size() );
+        while ( !sol.empty() ) {
+            printf( "%d - %d\n", sol.top().x, sol.top().y );
+            sol.pop();
+        }
+    }
+    return 0;
+}

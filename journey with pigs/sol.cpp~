@@ -1,0 +1,48 @@
+#include <cstdio>  
+#include <algorithm>  
+using namespace std;  
+typedef long long ll;  
+  
+  struct Node  
+  {  
+      ll value;  
+          int position;  
+              bool operator < (const Node a) const  
+                  {  
+                          return value > a.value;  
+                              }  
+                              } weight[1010], earn[1010];  
+                                
+                                ll dis[1010];  
+                                int ans[1010];  
+                                  
+                                  int main(void)  
+                                  {  
+                                      int n;  
+                                          ll t;///单位运费  
+                                              while (~scanf("%d%lld", &n, &t))  
+                                                  {  
+                                                          for (int i = 1; i <= n; i++)  
+                                                                  {  
+                                                                              scanf("%lld", &weight[i].value);  
+                                                                                          weight[i].position = i;  
+                                                                                                  }  
+                                                                                                          for (int i = 1; i <= n; i++)  
+                                                                                                                      scanf("%lld", &dis[i]);  
+                                                                                                                              for (int i = 1; i <= n; i++)  
+                                                                                                                                      {  
+                                                                                                                                                  ll x;  
+                                                                                                                                                              scanf("%lld", &x);  
+                                                                                                                                                                          earn[i].value = x - dis[i] * t;  
+                                                                                                                                                                                      earn[i].position = i;  
+                                                                                                                                                                                              }  
+                                                                                                                                                                                                      sort(weight + 1, weight + 1 + n);  
+                                                                                                                                                                                                              sort(earn + 1, earn + 1 + n);  
+                                                                                                                                                                                                                      for (int i = 1; i <= n; i++)  
+                                                                                                                                                                                                                                  ans[earn[i].position] = weight[i].position;  
+                                                                                                                                                                                                                                          for (int i = 1; i < n; i++)  
+                                                                                                                                                                                                                                                      printf("%d ", ans[i]);  
+                                                                                                                                                                                                                                                              printf("%d\n", ans[n]);  
+                                                                                                                                                                                                                                                                  } 
+                                                                                                                                                                                                                                                                      return 0;  ;
+                                                                                                                                                                                                                                                                      } nclude <algorithm>      using namespace std;    typedef long long ll;       struct Node     {       ll value;       int position;       bool operator < (const Node a) const        {           return value > a.value;         }   } weight[1010], earn[1010];         ll dis[1010];   int ans[1010];          int main(void)      {       int n;          ll t;///单位运费        while (~scanf("%d%lld", &n, &t))        {           for (int i = 1; i <= n; i++)            {               scanf("%lld", &weight[i].value);                weight[i].position = i;             }           for (int i = 1; i <= n; i++)                scanf("%lld", &dis[i]);             for (int i = 1; i <= n; i++)            {               ll x;               scanf("%lld", &x);                  earn[i].value = x - dis[i] * t;                 earn[i].position = i;           }           sort(weight + 1, weight + 1 + n);           sort(earn + 1, earn + 1 + n);           for (int i = 1; i <= n; i++)                ans[earn[i].position] = weight[i].position;             for (int i = 1; i < n; i++)                 printf("%d ", ans[i]);              printf("%d\n", ans[n]);         }       return 0;   }  ; 

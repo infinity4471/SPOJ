@@ -1,0 +1,157 @@
+#include <cstdio>
+#include <algorithm>
+#include <utility>
+ 
+#define MAXN 100100
+ 
+using namespace std;
+ 
+struct node {
+	int maxim;
+	long long flag;
+	bool up;
+};
+ 
+typedef pair< int, int > pii;
+ 
+node segtree[ 4*MAXN + 1 ];
+ 
+int readint() {
+    int n = 0;
+    char c = getchar_unlocked();
+    while ( !( '0' <= c && c <= '9' ) ) {
+        c = getchar_unlocked();
+    }
+    while ( '0' <= c && c <= '9' ) {
+        n = n * 10 + c - '0';
+        c = getchar_unlocked();
+    }
+    return n;
+}
+ 
+void init( int n, int l, int r, int* A )
+{
+	if( l == r ) {
+		segtree[ n ].maxim = A[ l ];
+		segtree[ n ].flag = 0;
+		segtree[ n ].up = 0;
+	} else {
+		init( 2*n, l, ( l + r ) / 2, A );
+		init( 2*n + 1, ( l + r ) / 2 + 1, r, A );
+		segtree[ n ].maxim = max( segtree[ 2*n ].maxim + segtree[ 2*n + 1 ].maxim );
+		segtree[ n ].flag = 0;
+		segtree[ n ].up = 0;
+	}
+}
+ 
+void unflag( int n, int l, int r )
+{
+	if( segtree[ n ].up ) {
+		segtree[ n ].maxim += segtree[ n ].flag;
+		if( l != r ) {
+			segtree[ 2*n ].flag += segtree[ n ].flag;
+			segtree[ 2*n + 1 ].flag += segtree[ n ].flag;
+			segtree[ 2*n ].up = true;
+			segtree[ 2*n + 1 ].up = true;
+		}
+		segtree[ n ].flag = 0;
+		segtree[ n ].up = false;
+	}
+}
+ 
+void update( int n, int l, int r, int i, int j, int v )
+{
+	if( r < i || l > j ) {
+		unflag( n, l, r );
+	}
+	else if( i <= l && r <= j ) {
+		segtree[ n ].flag += v;
+		segtree[ n ].up = true;
+		unflag( n, l, r );
+	} else {
+		unflag( n, l, r );
+		update( 2*n, l, ( l + r ) / 2, i, j, v );
+		update( 2*n + 1, ( l + r ) / 2 + 1, r, i, j, v );
+		if( l != r ) {
+			segtree[ n ].maxim = max( segtree[ 2*n ].maxim + segtree[ 2*n + 1 ].maxim );
+		}
+	}
+}
+ 
+int query( int n, int l, int r, int node )
+{
+	unflag( n, l, r );
+	if( l == r ) {
+		return segtree[ n ].sum;
+	}
+	else if( node <= ( l + r ) / 2 ) {
+		return query( 2*n, l, ( l + r ) / 2, node );
+	} else {
+		return query( 2*n + 1, ( l + r ) / 2 + 1, r, node );
+	}
+}
+ 
+void binup( int n, int X )
+{
+	int i , j;
+	for( i = 1, j = n; i <= j; ) {
+		int mid = ( i + j ) / 2;
+		if( query( 1, 1, n, mid ) < X ) {
+			i = mid + 1;
+		} else {
+			j = mid - 1;
+		}
+	}
+	if( i <= n ) {
+		update( 1, 1, n, i, n, -1 );
+	}
+}
+ 
+int binq( int n, int X )
+{
+	int i, j;
+        for( i = 1, j = n; i <= j; ) {
+		int mid = ( i + j ) / 2;
+		if( query( 1, 1, n, mid ) < X ) {
+                        i = mid + 1;
+                } else {
+                        j = mid - 1;	
+		}
+        }
+	return n - i + 1;
+}
+ 
+int main( void )
+{
+	int N,Q;
+	N = readint();
+	Q = readint();
+	pii AA[ N + 1 ];
+	for( int i = 1; i <= N; i++ ) {
+		int k;
+		k = readint();
+		AA[ i ] = make_pair( k, i );
+	}
+	int A[ N + 1 ], idx[ N + 1 ];
+	sort( AA + 1, AA + N + 1 );
+	for( int i = 1; i <= N; i++ ) {
+		A[ i ] = AA[ i ].first;
+		idx[ AA[ i ].second ] = i;
+	}
+	init( 1, 1, N, A );
+	while( Q-- ) {
+		int q, u;
+		q = readint();
+		u = readint();
+		if( q == 1 ) {
+			update( 1, 1, N, idx[ u ], idx[ u ], 1 );
+		}
+		else if( q == 2 ) {
+			printf("%d\n", binq( N, u ) );
+		}
+		else if( q == 3 ) {
+			binup( N, u );
+		}
+	} 
+	return 0;
+}

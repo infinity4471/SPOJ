@@ -1,0 +1,78 @@
+#include <cstdio>
+#include <algorithm>
+#include <vector>
+
+#define MAXN 100100
+#define INF 1234567890123456LL
+
+#define X first
+#define Y second
+#define mp make_pair
+#define pb push_back
+
+using namespace std;
+
+typedef long long ll;
+typedef pair< ll, ll > pll;
+
+int parent[ MAXN + 1 ];
+ll salary[ MAXN + 1 ];
+vector< int > T[ MAXN + 1 ];
+
+pll query( int u )
+{
+    pll ans = mp( salary[ u ], salary[ u ] ), newp;
+    for( int i = 0; i < ( int )T[ u ].size(); i++ ) {
+        int v = T[ u ][ i ];
+        newp = query( v );
+        ans.X += newp.X;
+        ans.Y = min( ans.Y, newp.Y );
+    }
+    return ans;
+}
+
+void update( int u, ll val )
+{
+    salary[ u ] += val;
+    for( int i = 0; i < ( int )T[ u ].size(); i++ ) {
+        int v = T[ u ][ i ];
+        update( v, val );
+    }
+}
+
+int main( void )
+{
+    freopen("test.in","rt",stdin);
+    freopen("test.out","wt",stdout);
+    int numcase;
+	scanf("%d", &numcase );
+	for( int z = 1; z <= numcase; z++ ) {
+		int N, Q, u, v;
+        ll s;
+		scanf("%d%d", &N, &Q );
+        
+        for( int i = 1; i <= N; i++ ) {
+            T[ i ].clear();
+        }
+		for( int i = 1; i <= N; i++ ) {
+			scanf("%d%lld", &u, &s );
+            parent[ i ] = u;
+            salary[ i ] = s;
+            T[ u ].pb( i );
+		}
+        
+        printf("Case %d:\n", z );
+
+        while( Q-- ) {
+            scanf("%d%d", &u, &v );
+            pll myp = query( v );
+            if( u == 1 ) {
+                printf("%lld\n", myp.X );
+            } else {
+                update( v, min( myp.Y, ( ll )1000 ) );
+            }
+        }
+	    
+    }
+	return 0;
+}

@@ -1,0 +1,42 @@
+#include <cstdio>
+#include <algorithm>
+
+#define INF 9876543210LL
+
+using namespace std;
+
+typedef long long ll;
+
+int main( void )
+{
+	int N;
+	while( scanf("%d", &N ) != EOF ) {
+		int A[ N + 1 ];
+		long long S[ N + 1 ], dp[ N + 1 ][ N + 1 ];
+		int mid[ N + 1 ][ N + 1 ];
+		S[ 0 ] = 0;
+		for( int i = 1; i <= N; i++ ) {
+			scanf("%d", &A[ i ] );
+			S[ i ] = S[ i - 1 ] + A[ i ];
+			mid[ i ][ i ] = i;
+			dp[ i ][ i ] = 0;
+		}
+		for( int l = 2; l <= N; l++ ) {
+			for( int i = 1; i <= N - l + 1; i++ ) {
+				int j = i + l - 1;
+				dp[ i ][ j ] = INF;
+				int left = mid[ i ][ j - 1 ], right = mid[ i + 1 ][ j ];
+				for( int k = left; k < right; k++ ) {
+					ll val = dp[ i ][ k ] + dp[ k + 1 ][ j ] + 
+								( ( S[ k ] - S[ i - 1 ] ) % 100 ) * ( ( S[ j ] - S[ k ] ) % 100 );
+					if( val < dp[ i ][ j ] ) {
+						dp[ i ][ j ] = val;
+						mid[ i ][ j ] = k;
+					}
+				}
+			}
+		}
+		printf("%lld\n", dp[ 1 ][ N ] );
+	}
+	return 0;
+}
